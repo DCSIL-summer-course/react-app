@@ -3,7 +3,11 @@ import ReactDOM from 'react-dom';
 
 let App = () => {
   return (
-    <h1>Hello World!...</h1>
+    <div>
+      <h1 style={{color: 'gray'}}>
+        Hello World!
+      </h1>
+    </div>
   );
 }
 

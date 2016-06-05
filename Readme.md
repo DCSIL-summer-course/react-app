@@ -21,7 +21,7 @@ sudo npm install webpack-dev-server -g
 Then to run the app:
 
 ```
-webpack-dev-server --progress --colors --hot --inline
+webpack-dev-server --hot --inline
 ```
 
 That gives you automatic reloads & updates.
@@ -64,7 +64,11 @@ import ReactDOM from 'react-dom';
 
 let App = () => {
   return (
-    <h1>Hello World!</h1>
+    <div>
+      <h1 style={{color: 'gray'}}>
+        Hello World!
+      </h1>
+    </div>
   );
 }
 
@@ -73,7 +77,91 @@ ReactDOM.render(<App/>, document.getElementById('root'));
 
 The first two lines import React and ReactDOM. ReactDOM is for interacting with the DOM (it was extracted out of React with the creation of ReactNative).
 
-The function `App` is a React component - by convention we capitalize components. Note the mixture of JavaScript (ES6) and HTML - this mixture is JSX.
+The function `App` is a React component - by convention we capitalize components. Note the mixture of JavaScript (ES6) and HTML - this mixture is JSX. Defining styles inline is also common in React - it makes the components more modular.
+
+There are a number of ways to create React components, the methods above is the ["stateless" functional method](https://facebook.github.io/react/docs/reusable-components.html#stateless-functions). React developers on why you should make stateless components:
+
+> In an ideal world, most of your components would be stateless functions because in the future we’ll also be able to make performance optimizations specific to these components by avoiding unnecessary checks and memory allocations. This is the recommended pattern, when possible.
 
 The final line calles our new component `<App/>` and adds it to `<div id="root"></div>`, which is already on our `index.html` page.
+
+
+## Create a new component
+
+We're going to create a `CatPic` component and eventually allows us to resize the pic dynamically. First create a new file called `cat-pic.jsx` within the `src/` folder.
+
+```jsx
+import React from 'react';
+
+const CatPic = () => {
+  return (
+    <div>
+      <img 
+        style={{width: 250 + 'px'}} 
+        src="https://i.ytimg.com/vi/tntOCGkgt98/maxresdefault.jpg"
+      />
+    </div>
+  );
+}
+
+export default CatPic;
+```
+
+Even though we don't use it explicitly we first we import `React`. Next we create an immutable (`const`) function called `CatPic`. By React convention functions that are components are capitalized. 
+
+### Using the component
+
+Update `src/app.jsx` to import our new component and use it:
+
+```
+import React from 'react';
+import ReactDOM from 'react-dom';
+import CatPic from './cat-pic.jsx';
+
+let App = () => {
+  return (
+    <div>
+      <h1 style={{color: 'gray'}}>
+        Hello World!
+      </h1>
+      <CatPic />
+    </div>
+  );
+}
+
+ReactDOM.render(<App/>, document.getElementById('root'));
+```
+
+## Create a button component 
+
+Our above app is entirely static, let's add two buttons that allow us to increase and decrease the size of the cat pic. First create a new file: `src/change-pic-size.jsx` and create a new component called `ChangePicSize` that includes a `<div>` with two buttons, each with an `onClick` function attached. For now each button will just log to the console.
+
+### Hint
+
+* Don't forget to import React
+* Don't forget to export your component
+* onClick is a property of the button element `<button onClick={() => {}}>
+
+### Cheat
+
+```jsx
+import React from 'react';
+
+const ChangePicSize = () => {
+  return (
+    <div>
+      <button onClick={() => {
+        console.log('increase size...');
+      }}>+ Increase</button>
+      <button onClick={() => {
+        console.log('decrease size...');
+      }}>- Decrease</button>
+    </div>
+  );
+}
+
+export default ChangePicSize;
+```
+
+## Redux & One-way flow of data
 
