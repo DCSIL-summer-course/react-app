@@ -60,7 +60,7 @@ Open up `index.html`
 
 ```jsx
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { render } from 'react-dom';
 
 let App = () => {
   return (
@@ -72,7 +72,7 @@ let App = () => {
   );
 }
 
-ReactDOM.render(<App/>, document.getElementById('root'));
+render(<App/>, document.getElementById('root'));
 ```
 
 The first two lines import React and ReactDOM. ReactDOM is for interacting with the DOM (it was extracted out of React with the creation of ReactNative).
@@ -115,7 +115,7 @@ Update `src/app.jsx` to import our new component and use it:
 
 ```
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { render } from 'react-dom';
 import CatPic from './cat-pic.jsx';
 
 let App = () => {
@@ -129,7 +129,7 @@ let App = () => {
   );
 }
 
-ReactDOM.render(<App/>, document.getElementById('root'));
+render(<App/>, document.getElementById('root'));
 ```
 
 ## Create a button component 
@@ -140,7 +140,7 @@ Our above app is entirely static, let's add two buttons that allow us to increas
 
 * Don't forget to import React
 * Don't forget to export your component
-* onClick is a property of the button element `<button onClick={() => {}}>
+* onClick is a property of the button element `<button onClick={() => {}}>`
 
 ### Cheat
 
@@ -165,3 +165,24 @@ export default ChangePicSize;
 
 ## Redux & One-way flow of data
 
+Redux, a library created by a Facebook developer, facilitates one-way data flow simply and elegantly. In order to make our buttons do something we're going to integrate Redux with less than 20 lines of code!
+
+How Redux works:
+
+1. It has a single state object that stores you're application's entire state. This might sound bad, but makes testing very easy.
+2. It uses functions (Redux calles them "reducers") to modify the state object.
+3. Events are emmitted by components of your app, Redux picks up these events and the reducer handles them.
+
+### Update the imports in `app.jsx`
+
+```jsx
+import React from 'react';
+import { render } from 'react-dom';
+import { createStore, combineReducers } from 'redux';
+import { Provider } from 'react-redux';
+
+import CatPic from './cat-pic.jsx';
+import ChangePicSize from './change-pic-size.jsx';
+```
+
+We're importing two functions from redux, `createStore` and `combineReducers`.
