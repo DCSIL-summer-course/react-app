@@ -11,7 +11,7 @@ Now you have React/ES6 syntax highlighting for Sublime Text 3!
 
 ## Setup
 
-Once you've downloaded this repo run the following commands from within this projects directory:
+Once you've downloaded this repo run the following commands from within this projects directory (_this instruction assumes you have node and npm already installed)_:
 
 ```
 npm install
@@ -24,7 +24,7 @@ Then to run the app:
 webpack-dev-server --hot --inline
 ```
 
-That gives you automatic reloads & updates.
+When visiting `http://localhost:8080/` in your browser you should see a "Hello World!" message. `webpack-dev-server` provides automatic reloads & updates.
 
 ## ES6 modules & JSX
 
