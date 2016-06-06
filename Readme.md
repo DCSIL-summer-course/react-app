@@ -444,7 +444,7 @@ export default CatPic;
 
 ### Cheat - `reducers/pic-size.jsx`
 
-Much of the complexity of solution below stems from the fact that `catPics` should not be mutated. The reducer should return either the exact same array (unchanged) or a new copy of `catPics`. To create a new copy we have to use the `...` (spread) operator.
+Much of the complexity of solution below stems from the fact that `catPics` should not be mutated. The reducer should return either the exact same array (unchanged) or a new copy of `catPics`. To create a new copy we have to use the `...` (spread) operator. Alternatively you can use Facebook's [immutable.js library](https://facebook.github.io/immutable-js/) to create immutable data structures.
 
 ```jsx
 import { catPics } from '../cat-pics-container.jsx';
