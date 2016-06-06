@@ -334,3 +334,144 @@ let CatPic = ({picSize}) => {
   );
 }
 ```
+
+Now when you click on either button the size of the pictures should change!
+
+## Bonus section
+
+You might be wondering how you'd handle more than one picture. Specifically, you'd only want one pair of buttons to update the size of one picture - not all the pictures. Our current state `picSize` only stores a single value - the reducer `picSizeReducer` would have to be updated to accomodate an array of objects. In the array of objects, each object would contain a single `size`, an `id` and the images `src`. 
+
+### Clues
+
+* Create a "container" component `CatPicsContainer` that iterates over all the cat pics and for each one uses one `<CatPic ...>` and one `<ChangePicSize ...>`
+* You'll need to pass the picId to `<ChangePicSize picId={catPic.id}>` so it can include the id when it dispatches the message.
+* Reducers should have no "side-effects" and should not modify the state object, just *create* and new state object (you should consider the state object immutable).
+* ES6 JavaScript arrays have a function called [`findIndex`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex) - it may be useful.
+* To create a new array from parts of an existing array you can use the ES6 ["spread"](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Operators/Spread_operator) operator.
+* You'll need to update `app.jsx`, `cat-pix.jsx` and `reducers/pic-size.jsx`.
+* You'll need to create a new file `cat-pics-container.jsx`.
+* You can "make-up" the id for each image.
+
+### Cheat - CatPicsContainer
+
+```jsx
+import React from 'react';
+import { connect } from 'react-redux';
+
+import CatPic from './cat-pic.jsx';
+import ChangePicSize from './change-pic-size.jsx';
+
+// catPics would likely come from a server
+let catPics = [
+    { id: 1, size: 250, src: 'https://i.ytimg.com/vi/tntOCGkgt98/maxresdefault.jpg' },
+    { id: 2, size: 250, src: 'http://www.medhatspca.ca/sites/default/files/news_photos/2014-Apr-15/node-147/cute-little-cat.jpg'}
+  ];
+
+let CatPicsContainer = ({catPics}) => {
+  return (
+    <div>
+      {catPics.map((catPic) => {
+        return <div key={catPic.id}>
+          <CatPic src={catPic.src} size={catPic.size}/>
+          <ChangePicSize picId={catPic.id}/>
+        </div>
+      })}
+    </div>
+  );
+}
+
+const mapStateToProps = (state) => {
+  return { catPics: state.catPics };
+}
+
+CatPicsContainer = connect(mapStateToProps)(CatPicsContainer);
+
+export { catPics, CatPicsContainer };
+export default CatPicsContainer;
+```
+
+### Cheat - `app.jsx`
+
+Make the following updates
+
+```jsx
+import { catPics, CatPicsContainer } from './cat-pics-container.jsx';
+
+import picSizeReducer from './reducers/pic-size.jsx';
+
+const appReducers = combineReducers({
+  catPics: picSizeReducer
+});
+
+const initialState = {
+  catPics: catPics
+}
+```
+
+and
+
+```jsx
+let App = () => {
+  return (
+    <div>
+      <h1 style={{color: 'gray'}}>
+        Hello World!
+      </h1>
+      <CatPicsContainer />
+    </div>
+  );
+}
+```
+
+### Cheat - `cat-pix.jsx`
+
+```jsx
+import React from 'react';
+
+let CatPic = ({ size, src }) => {
+  return (
+    <div>
+      <img 
+        style={{width: size + 'px'}} 
+        src={src}
+      />
+    </div>
+  );
+}
+
+export default CatPic;
+```
+
+### Cheat - `reducers/pic-size.jsx`
+
+Much of the complexity of solution below stems from the fact that `catPics` should not be mutated. The reducer should return either the exact same array (unchanged) or a new copy of `catPics`. To create a new copy we have to use the `...` (spread) operator.
+
+```jsx
+import { catPics } from '../cat-pics-container.jsx';
+
+const picSizeReducer = (pics=catPics, action) => {
+  var picIndex = pics.findIndex((pic) => { return pic.id === action.picId });
+  var pic = pics[picIndex];
+
+  switch(action.type){
+    case 'INCREASE_SIZE':
+      pic = Object.assign({}, pic, {size: pic.size + 10});
+      return [
+        ...pics.slice(0, picIndex),
+        pic,
+        ...pics.slice(picIndex + 1, pics.length)
+      ];
+    case 'DECREASE_SIZE':
+      pic = Object.assign({}, pic, {size: pic.size - 10});
+      return [
+        ...pics.slice(0, picIndex),
+        pic,
+        ...pics.slice(picIndex + 1, pics.length)
+      ];
+    default:
+      return pics;
+  }
+}
+
+export default picSizeReducer;
+```
