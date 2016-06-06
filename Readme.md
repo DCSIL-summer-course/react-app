@@ -93,7 +93,7 @@ We're going to create a `CatPic` component and eventually allows us to resize th
 ```jsx
 import React from 'react';
 
-const CatPic = () => {
+let CatPic = () => {
   return (
     <div>
       <img 
@@ -107,7 +107,7 @@ const CatPic = () => {
 export default CatPic;
 ```
 
-Even though we don't use it explicitly we first we import `React`. Next we create an immutable (`const`) function called `CatPic`. By React convention functions that are components are capitalized. 
+Even though we don't use it explicitly we first we import `React`. Next we create a function called `CatPic` (this is our component). By React convention functions that are components are capitalized. 
 
 ### Using the component
 
@@ -132,6 +132,8 @@ let App = () => {
 render(<App/>, document.getElementById('root'));
 ```
 
+In your browser you should now see a picture of a cat that's only 250 pixels wide.
+
 ## Create a button component 
 
 Our above app is entirely static, let's add two buttons that allow us to increase and decrease the size of the cat pic. First create a new file: `src/change-pic-size.jsx` and create a new component called `ChangePicSize` that includes a `<div>` with two buttons, each with an `onClick` function attached. For now each button will just log to the console.
@@ -141,6 +143,7 @@ Our above app is entirely static, let's add two buttons that allow us to increas
 * Don't forget to import React
 * Don't forget to export your component
 * onClick is a property of the button element `<button onClick={() => {}}>`
+* `import` your componet in `app.jsx` and add the component after `<CatPic/>`
 
 ### Cheat
 
@@ -162,6 +165,24 @@ let ChangePicSize = () => {
 
 export default ChangePicSize;
 ```
+
+## Connecting the button component to `app.jsx`
+
+Add the following import to `app.jsx`:
+
+```jsx
+import ChangePicSize from './change-pic-size.jsx';
+```
+
+Then add `<ChangePicSize />` right below `<CatPic />`:
+
+```jsx
+  <CatPic />
+  <ChangePicSize />
+```
+
+You should now see two buttons, that when clicked print to the console.
+    
 
 ## Redux & One-way flow of data
 
