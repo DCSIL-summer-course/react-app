@@ -207,7 +207,7 @@ import CatPic from './cat-pic.jsx';
 import ChangePicSize from './change-pic-size.jsx';
 ```
 
-We're importing two functions from redux, `createStore` and `combineReducers`. `combineReducers` accepts many reducers and returns a single reducers (as your app grows, so will the number of reducers). `createStore` accepts the reducer you've created and creates the app's store.
+We're importing two functions from redux, `createStore` and `combineReducers`. `combineReducers` accepts many reducers and returns a single reducer (as your app grows, so will the number of reducers). `createStore` accepts the reducer you've created and creates the app's store.
 
 ### Creating the store and reducer
 
@@ -235,13 +235,13 @@ render(
 , document.getElementById('root'));
 ```
 
-Using `Provider` will help to automatically inject the app's state object into each component.
+Using `Provider` will help to automatically inject the app's state object into each component. At this point there should be no errors in your console - if there are please double check your code and the error!
 
 ## Creating Our Reducer Function
 
-Create a new folder in `src` called `reducers`. In `reducers` create a file called `pic-size.jsx` - this will hold your reducer. The reducer is a function that takes two parameters, a `picSize` number and an `action` object. If `action.type` is `'INCREASE_SIZE'` then we want to returned incremented `picSize` by 10. If it's `'DECREASE_SIZE'` then we decrement by 10. 
+Create a new folder in `src` called `reducers`. In `reducers` create a file called `pic-size.jsx` - this will hold your reducer. The reducer is a function that takes two parameters, state and an action object. In our current reducer state will be `picSize`, a number. If `action.type` is `'INCREASE_SIZE'` then we want to return  `picSize + 10`. If it's `'DECREASE_SIZE'` then we `picSize - 10`. 
 
-if `picSize` is undefined return `250`, the default value. If the action is not recognized returned `picSize`.
+if `picSize` is undefined return `250`, the default value. If the action is not recognized return `picSize`.
 
 Try and create the pic size reducer on your own, below is the cheat.
 
@@ -262,6 +262,8 @@ const picSizeReducer = (picSize=250, action) => {
 export default picSizeReducer;
 ```
 
+In the above we're using ES6 default parameter (`picSize=250`) to deal with the scenario of picSize being undefined. 
+
 ### Connect our reducer to our app
 
 In `app.jsx` import the new reducer:
@@ -278,6 +280,8 @@ const appReducers = combineReducers({
 });
 
 ```
+
+At this point your app should still be error free, but the buttons are still just print to the console.
 
 ## Connecting `ChangePicSize` to redux
 
@@ -317,9 +321,9 @@ let ChangePicSize = ({dispatch}) => {
 }
 ```
 
-`ChangePicSize` now takes an object as a parameters, one of it's keys is called `dispatch`, which points to function that allows us to send messages. In the first onclick we send an `'INCREASE_SIZE'` message and the second we send a `'DECREASE_SIZE'`.
+`ChangePicSize` now takes an object as a parameter, one of its keys is called `dispatch`, which points to the dispatch function that allows us to trigger events. In the first onclick we send an `'INCREASE_SIZE'` message and the second we send a `'DECREASE_SIZE'`.
 
-Our comonent now sends the message to redux, which has a reducer function to change the state. We now need to connect our `CatPic` component to redux.
+Our component now sends the message to redux, which has a reducer function to change the state. We now need to connect our `CatPic` component to redux.
 
 ## Connecting `CatPic` to redux
 
@@ -357,6 +361,15 @@ let CatPic = ({picSize}) => {
 ```
 
 Now when you click on either button the size of the pictures should change!
+
+## Extras
+
+* [Redux documentation](http://redux.js.org/index.html)
+* [30 short, getting started with redux videos](https://egghead.io/series/getting-started-with-redux)
+* Defining components like we're doing above is not currently the most performant method, although Facebook developers promise that it will receive optimizations. Currently the most performant method to create components is: `class CatPic extends React.Component` (e.g. ES6 Classes). [More on performance](https://facebook.github.io/react/docs/advanced-performance.html)
+* Putting everything in `app.jsx`, like we do above, will quickly get out of control. In larger apps I've seen all the reducers being importated into a different file (e.g. `reducers/index.jsx`), then importing that file.
+
+
 
 ## Bonus section
 
@@ -496,3 +509,41 @@ const picSizeReducer = (pics=catPics, action) => {
 
 export default picSizeReducer;
 ```
+
+Or you can refactor above and do:
+
+```jsx
+import { catPics } from '../cat-pics-container.jsx';
+
+let updateArray = (array, index, item) => {
+  return [
+    ...array.slice(0, index),
+    item,
+    ...array.slice(index + 1, array.length)
+  ]
+}
+
+let updateObject = (obj, newKeyVals) => {
+  return Object.assign({}, obj, newKeyVals);
+}
+
+const picSizeReducer = (pics=catPics, action) => {
+  var picIndex = pics.findIndex((pic) => { return pic.id === action.picId });
+  var pic = pics[picIndex];
+
+  switch(action.type){
+    case 'INCREASE_SIZE':
+      pic = updateObject(pic, {size: pic.size + 10});
+      return updateArray(pics, picIndex, pic); 
+    case 'DECREASE_SIZE':
+      pic = updateObject(pic, {size: pic.size - 10});
+      return updateArray(pics, picIndex, pic);
+    default:
+      return pics;
+  }
+}
+
+export default picSizeReducer;
+```
+
+Even better - put `updateArray` and `updateObject` into a utilities file and import them... or just use immutable.js.
