@@ -147,7 +147,7 @@ Our above app is entirely static, let's add two buttons that allow us to increas
 ```jsx
 import React from 'react';
 
-const ChangePicSize = () => {
+let ChangePicSize = () => {
   return (
     <div>
       <button onClick={() => {
@@ -169,9 +169,10 @@ Redux, a library created by a Facebook developer, facilitates one-way data flow 
 
 How Redux works:
 
-1. It has a single state object that stores you're application's entire state. This might sound bad, but makes testing very easy.
-2. It uses functions (Redux calles them "reducers") to modify the state object.
-3. Events are emmitted by components of your app, Redux picks up these events and the reducer handles them.
+1. It has a single state object that stores your application's entire state. This might sound bad, but makes testing very easy.
+2. It uses functions (Redux calls them "reducers") to modify the state object.
+3. Events are emmitted by components of your app (e.g. button clicks), Redux picks up these events and the reducer handles them to modify the state.
+4. The new state flows through all the components, React figures out what components need to update and which don't.
 
 ### Update the imports in `app.jsx`
 
@@ -185,4 +186,163 @@ import CatPic from './cat-pic.jsx';
 import ChangePicSize from './change-pic-size.jsx';
 ```
 
-We're importing two functions from redux, `createStore` and `combineReducers`.
+We're importing two functions from redux, `createStore` and `combineReducers`. `combineReducers` accepts many reducers and returns a single reducers (as your app grows, so will the number of reducers). `createStore` accepts the reducer you've created and creates the app's store.
+
+### Creating the store and reducer
+
+After the `import` statements above add:
+
+```jsx
+const appReducers = combineReducers({
+  picSize: function(){ return {}; }
+});
+
+let store = createStore(appReducers);
+```
+
+The reducer that we're calling `picSize` does nothing at the moment, it's just an empty function. Eventually it will be responsible for change the size of picture.
+
+### Update the `render` call
+
+Again, in `app.jsx` update the render to read:
+
+```jsx
+render(
+  <Provider store={store}>
+    <App/>
+  </Provider>
+, document.getElementById('root'));
+```
+
+Using `Provider` will help to automatically inject the app's state object into each component.
+
+## Creating Our Reducer Function
+
+Create a new folder in `src` called `reducers`. In `reducers` create a file called `pic-size.jsx` - this will hold your reducer. The reducer is a function that takes two parameters, a `state` object and an `action` object. If `action.type` is `'INCREASE_SIZE'` then we want to increment `state.picSize` by 10. If it's `'DECREASE_SIZE'` then we decrement by 10. 
+
+We don't want to mutate the state object, only create a new object. To do so: 
+
+```jsx
+Object.assign({}, state, { picSize: state.picSize + 10
+```
+
+Try and create the pic size reducer on your own, below is the cheat.
+
+### Cheat
+
+```jsx
+const picSizeReducer = (state, action) => {
+  if(state === undefined){
+    return { picSize: 250};
+  }
+
+  switch(action.type){
+    case 'INCREASE_SIZE':
+      return Object.assign({}, state, {
+        picSize: state.picSize + 10
+      });
+    case 'DECREASE_SIZE':
+      return Object.assign({}, state, {
+        picSize: state.picSize - 10
+      });
+    default:
+      return state;
+  }
+}
+
+export default picSizeReducer;
+```
+
+### Connect our reducer to our app
+
+In `app.jsx` import the new reducer:
+
+```jsx
+import picSizeReducer from './reducers/pic-size.jsx';
+```
+
+Then update the `appReducers` to use the new function:
+
+```jsx
+const appReducers = combineReducers({
+  picSize: picSizeReducer
+});
+
+```
+
+## Connecting `ChangePicSize` to redux
+
+Open `change-pic-size.jsx` and first add the following import:
+
+```jsx
+import { connect } from 'react-redux';
+```
+
+`connect` is the function that we'll use to _connect_ our component to redux (so it can send messages).
+
+Right before the `export` statement add the following:
+
+```jsx
+ChangePicSize = connect()(ChangePicSize);
+```
+This line effectively creates a new version of ChangePicSize that is connected to redux and takes an object as a parameter that includes redux's dispatcher (What we'll use to send messages to update the state).
+
+Finally, update `ChangePicSize` component to:
+
+```jsx
+let ChangePicSize = ({dispatch}) => {
+  return (
+    <div>
+      <button onClick={() => {
+        dispatch({
+          type: 'INCREASE_SIZE'
+        });
+      }}>+ Increase</button>
+      <button onClick={() => {
+        dispatch({
+          type: 'DECREASE_SIZE'
+        });      
+      }}>- Decrease</button>
+    </div>
+  );
+}
+```
+
+`ChangePicSize` now takes an object as a parameters, one of it's keys is called `dispatch`, which points to function that allows us to send messages. In the first onclick we send an `'INCREASE_SIZE'` message and the second we send a `'DECREASE_SIZE'`.
+
+Our comonent now sends the message to redux, which has a reducer function to change the state. We now need to connect our `CatPic` component to redux.
+
+## Connecting `CatPic` to redux
+
+Open `cat-pic.jsx` and add the following import:
+
+```jsx
+import { connect } from 'react-redux';
+```
+
+Right above the `export` add the following code:
+
+```jsx
+const mapStateToProps = (state) => {
+  return state.picSize;
+}
+
+CatPic = connect(mapStateToProps)(CatPic);
+```
+
+The function `mapStateToProps` tells redux how to map the global state object to a `params` object that our component can use. 
+
+Finally update `CatPic`:
+
+```jsx
+let CatPic = ({picSize}) => {
+  return (
+    <div>
+      <img 
+        style={{width: picSize + 'px'}} 
+        src="https://i.ytimg.com/vi/tntOCGkgt98/maxresdefault.jpg"
+      />
+    </div>
+  );
+}
+```
