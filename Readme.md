@@ -218,35 +218,23 @@ Using `Provider` will help to automatically inject the app's state object into e
 
 ## Creating Our Reducer Function
 
-Create a new folder in `src` called `reducers`. In `reducers` create a file called `pic-size.jsx` - this will hold your reducer. The reducer is a function that takes two parameters, a `state` object and an `action` object. If `action.type` is `'INCREASE_SIZE'` then we want to increment `state.picSize` by 10. If it's `'DECREASE_SIZE'` then we decrement by 10. 
+Create a new folder in `src` called `reducers`. In `reducers` create a file called `pic-size.jsx` - this will hold your reducer. The reducer is a function that takes two parameters, a `picSize` number and an `action` object. If `action.type` is `'INCREASE_SIZE'` then we want to returned incremented `picSize` by 10. If it's `'DECREASE_SIZE'` then we decrement by 10. 
 
-We don't want to mutate the state object, only create a new object. To do so: 
-
-```jsx
-Object.assign({}, state, { picSize: state.picSize + 10
-```
+if `picSize` is undefined return `250`, the default value. If the action is not recognized returned `picSize`.
 
 Try and create the pic size reducer on your own, below is the cheat.
 
 ### Cheat
 
 ```jsx
-const picSizeReducer = (state, action) => {
-  if(state === undefined){
-    return { picSize: 250};
-  }
-
+const picSizeReducer = (picSize=250, action) => {
   switch(action.type){
     case 'INCREASE_SIZE':
-      return Object.assign({}, state, {
-        picSize: state.picSize + 10
-      });
+      return picSize + 10
     case 'DECREASE_SIZE':
-      return Object.assign({}, state, {
-        picSize: state.picSize - 10
-      });
+      return picSize - 10;
     default:
-      return state;
+      return picSize;
   }
 }
 
@@ -324,7 +312,7 @@ Right above the `export` add the following code:
 
 ```jsx
 const mapStateToProps = (state) => {
-  return state.picSize;
+  return { picSize: state.picSize };
 }
 
 CatPic = connect(mapStateToProps)(CatPic);
