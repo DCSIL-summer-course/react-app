@@ -15,7 +15,7 @@ Once you've downloaded this repo run the following commands from within this pro
 
 ```
 npm install
-sudo npm install webpack-dev-server -g
+sudo npm install webpack webpack-dev-server -g
 ```
 
 Then to run the app:
