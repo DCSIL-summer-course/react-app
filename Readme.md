@@ -11,7 +11,7 @@ Now you have React/ES6 syntax highlighting for Sublime Text 3!
 
 ## Setup
 
-Once you've downloaded this repo run the following commands from within this projects directory (_this instruction assumes you have node and npm already installed)_:
+Once you've downloaded this repo run the following commands from within this projects directory (_this instruction assumes you have node and npm already installed)_ (if on windows take the `sudo` out and run as admin):
 
 ```
 npm install
@@ -56,7 +56,7 @@ One of the major kinks about using transpiled code is using Chrome's debugger. T
 
 ## React
 
-Open up `app.js`
+Open up `app.jsx`
 
 ```jsx
 import React from 'react';
