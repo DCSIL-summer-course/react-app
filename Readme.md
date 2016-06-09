@@ -56,7 +56,7 @@ One of the major kinks about using transpiled code is using Chrome's debugger. T
 
 ## React
 
-Open up `index.html`
+Open up `app.js`
 
 ```jsx
 import React from 'react';
